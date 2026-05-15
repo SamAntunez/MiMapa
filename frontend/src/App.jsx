@@ -128,7 +128,7 @@ function Contact() {
     const formData = new FormData(e.target);
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/contacto/', {
+      const response = await fetch('https://mimapa-backend-k1ea.onrender.com/api/contacto/', {
         method: 'POST',
         body: formData,
       });
