@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Map, MapPin, Phone, Info, Download, ShieldCheck, Camera, Mail, MessageCircle, Paperclip } from 'lucide-react';
+import { Map, MapPin, Phone, Info, Download, ShieldCheck, Camera, Mail, MessageCircle, Paperclip, Loader2 } from 'lucide-react';
 
 function Navbar() {
   return (
@@ -116,6 +117,35 @@ function About() {
 }
 
 function Contact() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    const formData = new FormData(e.target);
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/contacto/', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        e.target.reset(); // Limpiar el formulario
+      } else {
+        setSubmitStatus('error');
+      }
+    } catch (error) {
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="bg-emerald-50 py-20 px-4 min-h-[80vh] relative">
       <div className="container mx-auto max-w-3xl relative z-10">
@@ -134,38 +164,53 @@ function Contact() {
           </a>
         </div>
 
-        <form className="space-y-6 bg-white p-8 md:p-10 rounded-2xl shadow-xl border border-emerald-100">
+        <form onSubmit={handleSubmit} className="space-y-6 bg-white p-8 md:p-10 rounded-2xl shadow-xl border border-emerald-100">
+          {submitStatus === 'success' && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+              <span className="block sm:inline">¡Mensaje enviado con éxito! Te contactaremos a la brevedad.</span>
+            </div>
+          )}
+          {submitStatus === 'error' && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+              <span className="block sm:inline">Ocurrió un error al enviar el mensaje. Revisa que el backend esté encendido.</span>
+            </div>
+          )}
+
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">Nombre y Apellido *</label>
-              <input type="text" required className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-secondary focus:border-secondary focus:outline-none transition" placeholder="Tu nombre completo" />
+              <input type="text" name="nombre" required className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-secondary focus:border-secondary focus:outline-none transition" placeholder="Tu nombre completo" />
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">Email *</label>
-              <input type="email" required className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-secondary focus:border-secondary focus:outline-none transition" placeholder="tu@correo.com" />
+              <input type="email" name="email" required className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-secondary focus:border-secondary focus:outline-none transition" placeholder="tu@correo.com" />
             </div>
           </div>
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">Asunto *</label>
-            <input type="text" required className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-secondary focus:border-secondary focus:outline-none transition" placeholder="Ej. Solicitud de mapa KML" />
+            <input type="text" name="asunto" required className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-secondary focus:border-secondary focus:outline-none transition" placeholder="Ej. Solicitud de mapa KML" />
           </div>
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">Mensaje o Requerimiento *</label>
-            <textarea required className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-secondary focus:border-secondary focus:outline-none transition" rows="5" placeholder="Detalla las coordenadas o el servicio que necesitas..."></textarea>
+            <textarea name="mensaje" required className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-secondary focus:border-secondary focus:outline-none transition" rows="5" placeholder="Detalla las coordenadas o el servicio que necesitas..."></textarea>
           </div>
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">Adjuntar archivo (Opcional)</label>
             <div className="flex items-center gap-3">
               <label className="cursor-pointer bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 text-primary px-5 py-3 rounded-lg flex items-center gap-2 font-medium transition shadow-sm">
                 <Paperclip className="w-5 h-5 text-secondary" /> Explorar archivos
-                <input type="file" className="hidden" />
+                <input type="file" name="archivo" className="hidden" />
               </label>
               <span className="text-sm text-gray-500">KML, SHP, PDF (Max 10MB)</span>
             </div>
           </div>
           <div className="pt-4">
-            <button type="submit" className="w-full bg-primary hover:bg-[#044031] text-white font-bold py-4 px-6 rounded-xl transition shadow-lg hover:shadow-xl hover:-translate-y-1 flex justify-center items-center gap-2">
-              <Mail className="w-5 h-5" /> Enviar Mensaje
+            <button type="submit" disabled={isSubmitting} className="w-full bg-primary hover:bg-[#044031] text-white font-bold py-4 px-6 rounded-xl transition shadow-lg hover:shadow-xl hover:-translate-y-1 flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+              {isSubmitting ? (
+                <><Loader2 className="w-5 h-5 animate-spin" /> Enviando...</>
+              ) : (
+                <><Mail className="w-5 h-5" /> Enviar Mensaje</>
+              )}
             </button>
           </div>
         </form>
