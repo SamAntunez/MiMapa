@@ -8,6 +8,7 @@ class ContactEmailView(APIView):
         nombre = request.data.get('nombre')
         email = request.data.get('email')
         asunto = request.data.get('asunto')
+        resultado_esperado = request.data.get('resultado_esperado', 'No especificado')
         mensaje = request.data.get('mensaje')
         archivo = request.FILES.get('archivo') # Captura el archivo adjunto
 
@@ -20,8 +21,9 @@ Nuevo mensaje de contacto desde la web de MiMapa:
 Nombre: {nombre}
 Email: {email}
 Asunto: {asunto}
+Resultado Esperado: {resultado_esperado}
 
-Mensaje:
+Mensaje o Requerimiento:
 {mensaje}
 """
         try:
