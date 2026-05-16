@@ -5,6 +5,7 @@ import Inicio from './pages/Inicio';
 import Esencia from './pages/Esencia';
 import Servicios from './pages/Servicios';
 import Contacto from './pages/Contacto';
+import Ingresar from './pages/Ingresar';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
             <Route path="/esencia" element={<Esencia />} />
             <Route path="/servicios" element={<Servicios />} />
             <Route path="/contacto" element={<Contacto />} />
+            <Route path="/ingresa" element={<Ingresar />} />
           </Routes>
         </main>
 
