@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { Globe2, MessageCircle, ChevronRight, Phone, Mail, MapPin } from 'lucide-react';
+import { Globe2, ChevronRight, Phone, Mail, MapPin } from 'lucide-react';
+import { WhatsAppIcon } from './Icons';
 
 export default function Footer() {
   return (
@@ -14,7 +15,7 @@ export default function Footer() {
           </p>
           <div className="flex gap-4">
              <a href="https://wa.me/56971640168" target="_blank" rel="noreferrer" className="bg-slate-900 border border-slate-800 p-3 rounded-full hover:bg-emerald-700 hover:text-white transition shadow-sm">
-               <MessageCircle className="w-6 h-6" />
+               <WhatsAppIcon className="w-6 h-6" />
              </a>
           </div>
         </div>
