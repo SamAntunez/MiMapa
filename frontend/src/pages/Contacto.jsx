@@ -7,33 +7,26 @@ export default function Contacto() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     setSubmitStatus(null);
     
     const form = e.target;
-    const archivoInput = form.elements['archivo'];
-    
-    // Validación de peso de archivo (2MB máximo)
-    if (archivoInput && archivoInput.files.length > 0) {
-      const file = archivoInput.files[0];
-      if (file.size > 2 * 1024 * 1024) { // 2MB en bytes
-        setSubmitStatus({ 
-          type: 'error', 
-          message: 'El archivo es demasiado pesado (máximo 2MB). Por favor escríbeme directamente al WhatsApp (+56 9 71640168) o envíame un enlace de Google Drive.' 
-        });
-        return; // Detenemos el envío
-      }
-    }
-
-    setIsSubmitting(true);
     const formData = new FormData(form);
+    const object = Object.fromEntries(formData);
     
-    // Añadimos la llave de acceso de Web3Forms directamente al FormData
-    formData.append("access_key", "b0e27955-da6f-4069-bca3-8f990ef84194");
+    // Web3Forms access key
+    object.access_key = "b0e27955-da6f-4069-bca3-8f990ef84194";
+    
+    const json = JSON.stringify(object);
     
     try {
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        body: formData,
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        },
+        body: json,
       });
       
       const data = await response.json();
@@ -42,7 +35,6 @@ export default function Contacto() {
         setSubmitStatus({ type: 'success', message: '¡Mensaje enviado con éxito! Me pondré en contacto contigo súper rápido.' });
         form.reset();
       } else {
-        // Mostrará la razón exacta del fallo
         setSubmitStatus({ type: 'error', message: `Error de Web3Forms: ${data.message}` });
       }
     } catch (error) {
@@ -64,7 +56,7 @@ export default function Contacto() {
           <div className="bg-slate-900 p-8 rounded-[2rem] border border-slate-800 inline-block text-left mb-10 max-w-2xl mx-auto shadow-lg">
             <ul className="space-y-4 text-slate-300 font-medium">
               <li className="flex items-start gap-3"><span className="bg-slate-950 border border-slate-800 p-1 rounded-full shadow-sm"><CheckCircle className="w-5 h-5 text-emerald-500"/></span> Describe lo que necesitas representar.</li>
-              <li className="flex items-start gap-3"><span className="bg-slate-950 border border-slate-800 p-1 rounded-full shadow-sm"><CheckCircle className="w-5 h-5 text-emerald-500"/></span> Adjunta un archivo de referencia (opcional).</li>
+              <li className="flex items-start gap-3"><span className="bg-slate-950 border border-slate-800 p-1 rounded-full shadow-sm"><CheckCircle className="w-5 h-5 text-emerald-500"/></span> Pega un enlace de referencia si tus archivos son pesados.</li>
               <li className="flex items-start gap-3"><span className="bg-slate-950 border border-slate-800 p-1 rounded-full shadow-sm"><CheckCircle className="w-5 h-5 text-emerald-500"/></span> Te responderé en <strong>menos de 24 horas</strong>.</li>
             </ul>
           </div>
@@ -120,22 +112,6 @@ export default function Contacto() {
             <textarea name="mensaje" required className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none transition shadow-inner text-white" rows="5" placeholder="Escribe aquí los detalles..."></textarea>
           </div>
 
-          <div>
-            <label className="block text-sm font-bold text-slate-400 mb-2">¿Tienes algún archivo de referencia? (Opcional)</label>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <label className="cursor-pointer bg-slate-800 border border-slate-700 hover:bg-slate-700 text-white px-6 py-4 rounded-2xl flex items-center gap-3 font-bold transition shadow-md w-full sm:w-auto justify-center">
-                <Paperclip className="w-5 h-5 text-emerald-400" /> Explorar archivos
-                <input type="file" name="archivo" className="hidden" />
-              </label>
-              <div className="flex flex-col">
-                <span className="text-sm text-slate-400 font-medium">KML, KMZ, SHP, PDF, DOC, ZIP <strong className="text-emerald-500">(Máx 2MB)</strong></span>
-                <span className="text-xs text-slate-500 mt-1 max-w-sm leading-relaxed">
-                  Si tu archivo es más pesado, por favor súbelo a <strong>Google Drive</strong> o <strong>WeTransfer</strong> y pega el enlace de descarga en la caja de mensaje arriba.
-                </span>
-              </div>
-            </div>
-          </div>
-
           <div className="pt-6">
             <button type="submit" disabled={isSubmitting} className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-5 px-6 rounded-2xl transition shadow-xl hover:shadow-emerald-900/50 hover:-translate-y-1 flex justify-center items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg border border-emerald-500">
               {isSubmitting ? (
@@ -146,6 +122,24 @@ export default function Contacto() {
             </button>
           </div>
         </form>
+
+        <div className="mt-16 flex flex-col items-center">
+          <div className="flex items-center gap-4 mb-8 w-full max-w-2xl">
+            <div className="h-px bg-slate-800 flex-1"></div>
+            <span className="text-slate-500 font-bold text-sm tracking-widest uppercase">O también puedes</span>
+            <div className="h-px bg-slate-800 flex-1"></div>
+          </div>
+          
+          <div className="bg-slate-900/60 p-8 md:p-10 rounded-[3rem] border border-emerald-900/30 flex flex-col items-center text-center w-full max-w-2xl shadow-xl hover:shadow-emerald-900/10 transition-shadow">
+            <h4 className="text-2xl font-extrabold text-white mb-3">Opción 2: Trato Directo</h4>
+            <p className="text-slate-400 font-medium mb-8 max-w-md">
+              Si prefieres no llenar formularios o necesitas enviarme archivos pesados (cartografías, ZIPs, fotos), hablemos directamente por WhatsApp.
+            </p>
+            <a href="https://wa.me/56971640168" target="_blank" rel="noreferrer" className="bg-[#25D366] hover:bg-[#20bd5a] text-white px-8 py-5 rounded-2xl font-bold flex items-center gap-3 transition shadow-lg hover:shadow-[#25D366]/30 hover:-translate-y-1 w-full sm:w-auto justify-center text-lg">
+              <MessageCircle className="w-7 h-7" /> Ir a WhatsApp
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   );
